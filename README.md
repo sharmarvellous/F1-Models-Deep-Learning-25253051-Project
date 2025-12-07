@@ -1,65 +1,81 @@
-F1 Models – Deep Learning Race Strategy Project
+# 🏎️ **F1 Models – Deep Learning Race Strategy Project**
 
-A hybrid Machine Learning + Deep Learning system designed to predict lap times, identify tyre degradation phases, and recommend race strategies for Autodromo Nazionale Monza. The project combines a Gradient Boosting regressor for lap-time forecasting with a CNN-LSTM sequence classifier for tyre-health prediction, all packaged as a production-ready API powering a real-time race-engineer dashboard.
+A hybrid **Machine Learning + Deep Learning** system designed to predict lap times, classify tyre degradation, and recommend race strategies specifically for **Autodromo Nazionale Monza**.
 
-🚀 Project Features
-Lap Time Prediction (Machine Learning)
+This project integrates:
+- **Gradient Boosting Regressor** → Lap-time forecasting  
+- **CNN-LSTM Network** → Tyre degradation classification  
+- **Flask API Server** → Real-time race predictions  
+- **Frontend Dashboard** → Live race-engineer interface  
 
-A Gradient Boosting Regressor trained on engineered telemetry-derived features to forecast the next-lap pace under varying stint conditions.
+---
 
-Tyre Degradation Classification (Deep Learning)
+# 🚀 **Project Features**
 
-A CNN-LSTM network trained on sliding sequences of real lap times to classify tyre condition into:
+## 🔹 **Lap Time Prediction (Machine Learning)**  
+A **Gradient Boosting Regressor** trained on high-resolution telemetry-derived features to forecast next-lap pace under live race conditions.
 
-Fresh
+---
 
-Optimal
+## 🔹 **Tyre Degradation Classification (Deep Learning)**  
+A hybrid **CNN-LSTM** model that learns degradation patterns from sequences of ten consecutive lap times to classify tyres into:
 
-Worn
+- 🟢 **Fresh**
+- 🔵 **Optimal**
+- 🟠 **Worn**
+- 🔴 **Critical**
 
-Critical
+---
 
-Race Strategy Engine
+## 🔹 **Race Strategy Engine (ML + DL)**  
+Automatically recommends:
 
-Combines ML + DL outputs to recommend:
+- 🛑 Pit instructions  
+- 🔄 Compound switching (Soft ↔ Medium ↔ Hard)  
+- 🏎️ Pace management suggestions  
+- ⚠️ Risk detection (punctures, SC/VSC distortions, pit out-laps)
 
-Pit stop timing
+---
 
-Compound switching
 
-Pace management
+---
 
-Risk scenarios (puncture-like slow laps, pit out-laps, SC/VSC distortions)
+## 🔹 **Frontend Dashboard (Race Engineer UI)**  
+Displays:
 
-REST API Server
+- Lap comparison  
+- Tyre condition gauges  
+- Confidence metrics  
+- Strategy panel  
+- Track map & sector layout  
+- Stint history and compound usage  
 
-Backend endpoints served using Flask:
+---
 
-/api/analyze – full model inference
+# 🧩 **System Architecture**
 
-/api/batch-analyze – multiple laps
+```text
+      ┌─────────────────────┐
+      │  Frontend Dashboard │
+      └──────────┬──────────┘
+                 │ HTTP (JSON)
+                 ▼
+        ┌────────────────────┐
+        │    Flask API       │
+        └──────┬──────┬─────┘
+               │      │
+               │      │
+  ┌────────────▼┐  ┌──▼─────────────────┐
+  │ Lap Time ML │  │ Tyre DL (CNN-LSTM) │
+  └──────┬──────┘  └──────────┬─────────┘
+         │                     │
+         └──────────┬─────────┘
+                    ▼
+          ┌──────────────────┐
+          │ Strategy Engine  │
+          └──────────────────┘
+Endpoints:
 
-/api/drivers – available drivers
-
-/api/health – server status
-
-Interactive Frontend
-
-A race-engineer UI displaying:
-
-Lap comparison
-
-Tyre condition visualization
-
-Strategy recommendations
-
-Driver selection
-
-Circuit statistics
-
-Stint history
-
-📂 Repository Structure
 |-- models/
 |     |-- gradient_boosting_model.pkl
 |     |-- tire_degradation_model_final.h5
@@ -72,23 +88,24 @@ Stint history
 |-- requirements.txt
 |-- README.md
 
+
 🔧 1. Installation
 Clone the repository
 git clone https://github.com/sharmarvellous/F1-Models-Deep-Learning-25253051-Project.git
 cd F1-Models-Deep-Learning-25253051-Project
 
-Install all dependencies
+Install dependencies
 pip install -r requirements.txt
-pip install tensorflow       # CPU version recommended
+pip install tensorflow
 
-🧠 2. Running the Race Strategy Backend
+🧠 2. Running the API Server
 
-Start the model API server:
+Run:
 
 python api_server.py
 
 
-You will see:
+Expected startup:
 
 🔥 MONZA STRATEGY API SERVER
 Available endpoints:
@@ -98,12 +115,13 @@ Available endpoints:
 /api/batch-analyze
 
 
-Server URL:
+Server runs at:
 
 http://localhost:5000
 
+
 📡 3. API Usage
-POST /api/analyze – Predict for a single lap
+POST /api/analyze
 Request
 {
   "driver": "16",
@@ -122,7 +140,7 @@ Response
 
 🖥️ 4. Connecting the Frontend
 
-Your frontend can call the backend like this:
+Example fetch call:
 
 fetch("http://localhost:5000/api/analyze", {
   method: "POST",
@@ -132,46 +150,29 @@ fetch("http://localhost:5000/api/analyze", {
 .then(res => res.json())
 .then(data => console.log(data));
 
+🎥 5. Demo Video (Google Drive)
 
-The frontend outputs:
+GitHub cannot host large high-quality videos, so the full demonstration is here:
 
-Predicted lap time
+👉 Full Demo Video:
+https://drive.google.com/file/d/1nGqoFcQRsTgP9b3mn2Wf7BL0UkcWGaQl/view?usp=sharing
 
-Tyre condition & confidence
+Includes:
 
-Strategy (maintain pace, pit now, extend, etc.)
+Frontend walkthrough
 
-Driver comparison panel
+Side-by-side driver comparison
 
-Circuit metrics (Monza map, lap length, laps remaining)
+Tyre health predictions
 
-🎥 5. Demo Video (Hosted on Google Drive)
+Real-time strategy engine demo
 
-GitHub cannot store the full-quality demo video due to file-size limits.
+📊 6. Model Training Resources Included
 
-🔗 Full Demo Video:
-👉 https://drive.google.com/file/d/1nGqoFcQRsTgP9b3mn2Wf7BL0UkcWGaQl/view?usp=sharing
+training_history.png → Loss & accuracy curves
 
-The video includes:
+model_performance.txt → Evaluation summary
 
-Full frontend UI demo
+tire_degradation_model_final.h5 → CNN-LSTM
 
-Real-time API interaction
-
-Head-to-head driver comparison
-
-Tyre degradation predictions
-
-Lap-time forecasting workflow
-
-📊 6. Model Training Resources
-
-Included in this repository:
-
-training_history.png – learning curves
-
-model_performance.txt – evaluation summary
-
-tire_degradation_model_final.h5 – trained CNN-LSTM
-
-gradient_boosting_model.pkl – ML model
+gradient_boosting_model.pkl → ML model
