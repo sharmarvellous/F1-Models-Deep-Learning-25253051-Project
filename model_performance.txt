@@ -1,0 +1,30 @@
+Tire Degradation Model Performance
+==================================================
+
+Overall Accuracy: 0.8595
+Overall Loss: 0.4020
+
+Per-Class Accuracy:
+  Fresh: 0.9550
+  Optimal: 0.7253
+  Worn: 0.7993
+  Critical: 0.8700
+
+Confusion Matrix:
+          Fresh  Optimal  Worn  Critical
+Fresh       382       13     3         2
+Optimal      24      132    24         2
+Worn         10       42   239         8
+Critical      2        0    50       348
+
+Classification Report:
+              precision    recall  f1-score   support
+
+       Fresh       0.91      0.95      0.93       400
+     Optimal       0.71      0.73      0.72       182
+        Worn       0.76      0.80      0.78       299
+    Critical       0.97      0.87      0.92       400
+
+    accuracy                           0.86      1281
+   macro avg       0.84      0.84      0.84      1281
+weighted avg       0.86      0.86      0.86      1281

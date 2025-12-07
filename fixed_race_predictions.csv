@@ -1,0 +1,5 @@
+driver,lap,stint_laps,compound,last_lap,predicted_lap,delta,tire_condition,confidence,strategy_action,strategy_reason,strategy_risk
+HAM,32,18,SOFT,95.8,93.8,-2.0,FRESH,0.405,PUSH,Tires in optimal condition - push for fastest laps,low
+VER,28,12,MEDIUM,90.5,90.46,-0.04,CRITICAL,0.295,CONSIDER_PIT_NEXT_LAP,Tires critically degraded (+-0.04s/lap) - box next lap (low confidence classification),high
+LEC,15,5,HARD,90.3,90.5,0.2,FRESH,0.993,PUSH,Tires in optimal condition - push for fastest laps,low
+SAI,42,25,SOFT,109.5,102.5,-7.0,FRESH,0.403,PUSH,Tires in optimal condition - push for fastest laps,low

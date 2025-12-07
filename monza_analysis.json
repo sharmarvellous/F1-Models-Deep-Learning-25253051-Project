@@ -1,0 +1,53 @@
+{
+  "metadata": {
+    "driver": "VER",
+    "lap_number": 25,
+    "year": 2024,
+    "circuit": "Monza",
+    "session_type": "R",
+    "timestamp": "2025-12-03T22:20:37.003240"
+  },
+  "lap_data": {
+    "actual_lap_time": 83.801,
+    "predicted_pace": 118.898,
+    "delta_seconds": -35.097,
+    "delta_percent": -29.52,
+    "compound": "HARD",
+    "tire_age": 3,
+    "stint": 2
+  },
+  "tire_analysis": {
+    "condition": "Critical",
+    "confidence": 1.0,
+    "probabilities": {
+      "Fresh": 0.0,
+      "Optimal": 0.0,
+      "Worn": 0.0,
+      "Critical": 1.0
+    }
+  },
+  "scenario": {
+    "classification": "STRONG_PACE",
+    "details": {
+      "lap_time": 83.801,
+      "predicted_pace": 118.89754205591714,
+      "tire_age": 3,
+      "compound": "HARD",
+      "pace_delta_pct": -29.518307484784966,
+      "speed_delta": 13.350000000000023
+    }
+  },
+  "strategy": {
+    "action": "PIT_WITHIN_2_LAPS",
+    "priority": "HIGH",
+    "reasoning": "Tires critically degraded",
+    "laps_to_execute": 2
+  },
+  "recommendation": {
+    "next_compound": "HARD"
+  },
+  "race_context": {
+    "laps_remaining": 28.0,
+    "total_laps": 53
+  }
+}

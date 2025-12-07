@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F1 Strategy Intelligence • Monza 2024</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --redbull: #0600EF;
+            --mercedes: #00D2BE;
+            --ferrari: #DC0000;
+            --mclaren: #FF8700;
+            --aston: #006F62;
+            --alpine: #0090FF;
+            --williams: #005AFF;
+            --alphatauri: #2B4562;
+            --sauber: #52E252;
+            --haas: #EB0A1E;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        
+        .mono {
+            font-family: 'Space Mono', monospace;
+        }
+        
+        /* Modern Header */
+        .modern-header {
+            background: linear-gradient(135deg, rgba(20,20,20,0.95) 0%, rgba(10,10,10,0.98) 100%);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 1.5rem 2rem;
+        }
+        
+        .logo-text {
+            font-weight: 900;
+            font-size: 1.25rem;
+            letter-spacing: 0.15em;
+            background: linear-gradient(135deg, #ff4444 0%, #ff6b6b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Curved Progress Container */
+        .progress-container {
+            background: linear-gradient(135deg, rgba(25,25,25,0.6) 0%, rgba(15,15,15,0.8) 100%);
+            backdrop-filter: blur(40px);
+            border-radius: 32px;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.06);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,107,0,0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        .progress-percent {
+            font-size: 5rem;
+            font-weight: 900;
+            line-height: 0.9;
+            background: linear-gradient(135deg, #ff6b00 0%, #ffa500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .progress-bars-modern {
+            display: grid;
+            grid-template-columns: repeat(53, 1fr);
+            gap: 3px;
+            height: 8px;
+            margin-top: 1.5rem;
+        }
+        
+        .bar-segment {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .bar-segment.active {
+            background: linear-gradient(135deg, #ff6b00 0%, #ffa500 100%);
+            box-shadow: 0 0 12px rgba(255,107,0,0.6);
+        }
+        
+        /* Circuit Info - Modern Bento Grid */
+        .circuit-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .circuit-card {
+            background: linear-gradient(135deg, rgba(25,25,25,0.6) 0%, rgba(15,15,15,0.8) 100%);
+            backdrop-filter: blur(40px);
+            border-radius: 24px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.06);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .circuit-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(180deg, #ff6b00 0%, transparent 100%);
+        }
+        
+        .stat-label {
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            font-family: 'Space Mono', monospace;
+        }
+        
+        /* Driver Selection - Modern Pills */
+        .selection-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1rem;
+        }
+        
+        .selection-panel {
+            background: linear-gradient(135deg, rgba(25,25,25,0.6) 0%, rgba(15,15,15,0.8) 100%);
+            backdrop-filter: blur(40px);
+            border-radius: 28px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        
+        .panel-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #ff4444;
+            margin-bottom: 1rem;
+        }
+        
+        .drivers-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+        }
+        
+        .driver-pill {
+            background: rgba(255,255,255,0.03);
+            border: 1.5px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .driver-pill::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .driver-pill:hover::before {
+            opacity: 1;
+        }
+        
+        .driver-pill:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255,255,255,0.2);
+        }
+        
+        .driver-pill.selected {
+            border-width: 2px;
+            transform: translateY(-3px) scale(1.02);
+        }
+        
+        .driver-number {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1.125rem;
+            font-family: 'Space Mono', monospace;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        }
+        
+        .driver-code {
+            font-weight: 700;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+        }
+        
+        .driver-surname {
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.5);
+            font-weight: 500;
+        }
+        
+        .driver-team {
+            font-size: 0.6rem;
+            color: rgba(255,255,255,0.35);
+            font-weight: 400;
+            text-align: center;
+            line-height: 1.2;
+        }
+        
+        /* Lap Input - Modern Centered Design */
+        .lap-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        .lap-input {
+            width: 100%;
+            background: rgba(0,0,0,0.4);
+            border: 2px solid rgba(255,255,255,0.08);
+            border-radius: 24px;
+            padding: 2rem 1rem;
+            text-align: center;
+            font-size: 4rem;
+            font-weight: 900;
+            font-family: 'Space Mono', monospace;
+            color: #fff;
+            transition: all 0.3s;
+        }
+        
+        .lap-input:focus {
+            outline: none;
+            border-color: #ff6b00;
+            box-shadow: 0 0 0 4px rgba(255,107,0,0.1);
+        }
+        
+        .analyze-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #ff4444 0%, #ff6b6b 100%);
+            border: none;
+            border-radius: 20px;
+            padding: 1.25rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 24px rgba(255,68,68,0.3);
+        }
+        
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(255,68,68,0.4);
+        }
+        
+        .analyze-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* Results - Bento Grid Layout */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1rem;
+        }
+        
+        .result-card {
+            background: linear-gradient(135deg, rgba(25,25,25,0.6) 0%, rgba(15,15,15,0.8) 100%);
+            backdrop-filter: blur(40px);
+            border-radius: 28px;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.06);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .driver-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        
+        .driver-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 2rem;
+            font-family: 'Space Mono', monospace;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+        
+        .driver-info h3 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: 0.25rem;
+        }
+        
+        .driver-info p {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.5);
+            font-weight: 600;
+        }
+        
+        .lap-time {
+            font-size: 4rem;
+            font-weight: 900;
+            font-family: 'Space Mono', monospace;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+        
+        .delta {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+        
+        .metric-card {
+            background: rgba(0,0,0,0.3);
+            border-radius: 20px;
+            padding: 1.25rem;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .metric-label {
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 0.75rem;
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            font-family: 'Space Mono', monospace;
+        }
+        
+        .tire-indicator {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.875rem;
+            margin: 0 auto 0.75rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+        
+        .compound-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+        
+        .priority-badge {
+            display: inline-block;
+            padding: 0.375rem 0.875rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.65rem;
+            letter-spacing: 0.08em;
+        }
+        
+        /* Team Colors */
+        .team-redbull { border-color: var(--redbull); }
+        .team-redbull.selected { border-color: var(--redbull); box-shadow: 0 4px 20px rgba(6,0,239,0.4); }
+        .bg-redbull { background: var(--redbull); }
+        
+        .team-mercedes { border-color: var(--mercedes); }
+        .team-mercedes.selected { border-color: var(--mercedes); box-shadow: 0 4px 20px rgba(0,210,190,0.4); }
+        .bg-mercedes { background: var(--mercedes); }
+        
+        .team-ferrari { border-color: var(--ferrari); }
+        .team-ferrari.selected { border-color: var(--ferrari); box-shadow: 0 4px 20px rgba(220,0,0,0.4); }
+        .bg-ferrari { background: var(--ferrari); }
+        
+        .team-mclaren { border-color: var(--mclaren); }
+        .team-mclaren.selected { border-color: var(--mclaren); box-shadow: 0 4px 20px rgba(255,135,0,0.4); }
+        .bg-mclaren { background: var(--mclaren); }
+        
+        .team-aston { border-color: var(--aston); }
+        .team-aston.selected { border-color: var(--aston); box-shadow: 0 4px 20px rgba(0,111,98,0.4); }
+        .bg-aston { background: var(--aston); }
+        
+        .team-alpine { border-color: var(--alpine); }
+        .team-alpine.selected { border-color: var(--alpine); box-shadow: 0 4px 20px rgba(0,144,255,0.4); }
+        .bg-alpine { background: var(--alpine); }
+        
+        .team-williams { border-color: var(--williams); }
+        .team-williams.selected { border-color: var(--williams); box-shadow: 0 4px 20px rgba(0,90,255,0.4); }
+        .bg-williams { background: var(--williams); }
+        
+        .team-alphatauri { border-color: var(--alphatauri); }
+        .team-alphatauri.selected { border-color: var(--alphatauri); box-shadow: 0 4px 20px rgba(43,69,98,0.4); }
+        .bg-alphatauri { background: var(--alphatauri); }
+        
+        .team-sauber { border-color: var(--sauber); }
+        .team-sauber.selected { border-color: var(--sauber); box-shadow: 0 4px 20px rgba(82,226,82,0.4); }
+        .bg-sauber { background: var(--sauber); }
+        
+        .team-haas { border-color: var(--haas); }
+        .team-haas.selected { border-color: var(--haas); box-shadow: 0 4px 20px rgba(235,10,30,0.4); }
+        .bg-haas { background: var(--haas); }
+        
+        /* Utility */
+        .hidden { display: none; }
+        
+        @media (max-width: 1280px) {
+            .drivers-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        
+        @media (max-width: 768px) {
+            .drivers-grid { grid-template-columns: repeat(2, 1fr); }
+            .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- Modern Header -->
+    <header class="modern-header">
+        <div class="max-w-[1600px] mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <path d="M16 2L28 9V23L16 30L4 23V9L16 2Z" fill="url(#gradient)" stroke="#ff4444" stroke-width="2"/>
+                    <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#ff4444"/>
+                            <stop offset="100%" style="stop-color:#ff6b6b"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span class="logo-text">STRATEGY INTEL</span>
+            </div>
+            <div class="flex items-center gap-6 text-xs font-semibold">
+                <span class="text-gray-500">MONZA 2024</span>
+                <span class="text-red-500 flex items-center gap-2">
+                    <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                    LIVE
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-[1600px] mx-auto p-6 space-y-6">
+        
+        <!-- Race Progress -->
+        <div class="progress-container">
+            <div class="grid grid-cols-12 gap-6 items-center relative z-10">
+                <div class="col-span-3">
+                    <div class="progress-percent mono" id="progressPercent">0%</div>
+                    <div class="text-sm font-semibold text-gray-400 mt-2">
+                        <span id="currentLap">0</span>/<span>53</span> LAPS
+                    </div>
+                </div>
+                <div class="col-span-9">
+                    <div class="progress-bars-modern" id="progressBars"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Circuit Info Bento Grid -->
+        <div class="circuit-grid">
+            <div class="circuit-card col-span-4" style="padding: 1rem;">
+                <div class="stat-label mb-3">Autodromo Nazionale Monza</div>
+                <img src="Italy_Circuit.avif" alt="Monza Circuit" style="width: 100%; height: auto; border-radius: 16px; opacity: 0.9;">
+            </div>
+            <div class="circuit-card col-span-2">
+                <div class="stat-label">Circuit Length</div>
+                <div class="stat-value">5.793<span class="text-lg text-gray-500">km</span></div>
+            </div>
+            <div class="circuit-card col-span-2">
+                <div class="stat-label">Race Distance</div>
+                <div class="stat-value">306.72<span class="text-lg text-gray-500">km</span></div>
+            </div>
+            <div class="circuit-card col-span-2">
+                <div class="stat-label">Total Laps</div>
+                <div class="stat-value">53</div>
+            </div>
+            <div class="circuit-card col-span-2">
+                <div class="stat-label">Lap Record</div>
+                <div class="stat-value text-2xl">1:21.046</div>
+                <div class="text-xs text-gray-600 mt-1">Barrichello '04</div>
+            </div>
+        </div>
+
+        <!-- Driver Selection Grid -->
+        <div class="selection-grid">
+            <!-- Primary Driver -->
+            <div class="selection-panel col-span-5">
+                <div class="panel-title">Primary Driver</div>
+                <div class="drivers-grid" id="primaryGrid"></div>
+            </div>
+
+            <!-- Lap Input -->
+            <div class="selection-panel col-span-2">
+                <div class="panel-title">Lap Number</div>
+                <div class="lap-panel">
+                    <input type="number" id="lapInput" class="lap-input" value="25" min="1" max="53">
+                    <div class="text-xs text-gray-500 font-semibold">OF 53 LAPS</div>
+                    <button class="analyze-btn" onclick="analyze()">Analyze</button>
+                    <div id="error" class="hidden text-xs text-red-400 text-center mt-2"></div>
+                    <div id="loading" class="hidden text-xs text-gray-400 text-center mt-2 animate-pulse">Loading data...</div>
+                </div>
+            </div>
+
+            <!-- Compare Driver -->
+            <div class="selection-panel col-span-5">
+                <div class="panel-title">Compare With <span class="text-gray-600">(Optional)</span></div>
+                <div class="drivers-grid" id="compareGrid"></div>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div id="results" class="hidden space-y-6"></div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        
+        const DRIVERS = [
+            { code: 'LEC', name: 'Charles Leclerc', surname: 'Leclerc', team: 'Scuderia Ferrari HP', color: '#DC0000', number: '16', teamClass: 'team-ferrari' },
+            { code: 'SAI', name: 'Carlos Sainz', surname: 'Sainz', team: 'Scuderia Ferrari HP', color: '#DC0000', number: '55', teamClass: 'team-ferrari' },
+            { code: 'VER', name: 'Max Verstappen', surname: 'Verstappen', team: 'Oracle Red Bull Racing', color: '#0600EF', number: '1', teamClass: 'team-redbull' },
+            { code: 'PER', name: 'Sergio Pérez', surname: 'Pérez', team: 'Oracle Red Bull Racing', color: '#0600EF', number: '11', teamClass: 'team-redbull' },
+            { code: 'HAM', name: 'Lewis Hamilton', surname: 'Hamilton', team: 'Mercedes-AMG Petronas', color: '#00D2BE', number: '44', teamClass: 'team-mercedes' },
+            { code: 'RUS', name: 'George Russell', surname: 'Russell', team: 'Mercedes-AMG Petronas', color: '#00D2BE', number: '63', teamClass: 'team-mercedes' },
+            { code: 'NOR', name: 'Lando Norris', surname: 'Norris', team: 'McLaren', color: '#FF8700', number: '4', teamClass: 'team-mclaren' },
+            { code: 'PIA', name: 'Oscar Piastri', surname: 'Piastri', team: 'McLaren', color: '#FF8700', number: '81', teamClass: 'team-mclaren' },
+            { code: 'ALO', name: 'Fernando Alonso', surname: 'Alonso', team: 'Aston Martin Aramco', color: '#006F62', number: '14', teamClass: 'team-aston' },
+            { code: 'STR', name: 'Lance Stroll', surname: 'Stroll', team: 'Aston Martin Aramco', color: '#006F62', number: '18', teamClass: 'team-aston' },
+            { code: 'GAS', name: 'Pierre Gasly', surname: 'Gasly', team: 'BWT Alpine F1 Team', color: '#0090FF', number: '10', teamClass: 'team-alpine' },
+            { code: 'OCO', name: 'Esteban Ocon', surname: 'Ocon', team: 'BWT Alpine F1 Team', color: '#0090FF', number: '31', teamClass: 'team-alpine' },
+            { code: 'BOT', name: 'Valtteri Bottas', surname: 'Bottas', team: 'Stake F1 Team KICK Sauber', color: '#52E252', number: '77', teamClass: 'team-sauber' },
+            { code: 'ZHO', name: 'Zhou Guanyu', surname: 'Zhou', team: 'Stake F1 Team KICK Sauber', color: '#52E252', number: '24', teamClass: 'team-sauber' },
+            { code: 'MAG', name: 'Kevin Magnussen', surname: 'Magnussen', team: 'MoneyGram Haas F1 Team', color: '#B6BABD', number: '20', teamClass: 'team-haas' },
+            { code: 'HUL', name: 'Nico Hülkenberg', surname: 'Hülkenberg', team: 'MoneyGram Haas F1 Team', color: '#B6BABD', number: '27', teamClass: 'team-haas' },
+            { code: 'TSU', name: 'Yuki Tsunoda', surname: 'Tsunoda', team: 'Visa Cash App RB (VCARB / RB)', color: '#2B4562', number: '22', teamClass: 'team-alphatauri' },
+            { code: 'RIC', name: 'Daniel Ricciardo', surname: 'Ricciardo', team: 'Visa Cash App RB (VCARB / RB)', color: '#2B4562', number: '3', teamClass: 'team-alphatauri' },
+            { code: 'ALB', name: 'Alexander Albon', surname: 'Albon', team: 'Williams Racing', color: '#005AFF', number: '23', teamClass: 'team-williams' },
+            { code: 'SAR', name: 'Logan Sargeant', surname: 'Sargeant', team: 'Williams Racing', color: '#005AFF', number: '2', teamClass: 'team-williams' },
+        ];
+
+        let selectedPrimary = null;
+        let selectedCompare = null;
+
+        function init() {
+            const primaryGrid = document.getElementById('primaryGrid');
+            const compareGrid = document.getElementById('compareGrid');
+
+            DRIVERS.forEach(driver => {
+                primaryGrid.appendChild(createDriverPill(driver, 'primary'));
+                compareGrid.appendChild(createDriverPill(driver, 'compare'));
+            });
+
+            updateProgress(0);
+        }
+
+        function createDriverPill(driver, type) {
+            const pill = document.createElement('div');
+            pill.className = `driver-pill ${driver.teamClass}`;
+            pill.onclick = () => selectDriver(driver.code, type);
+            pill.dataset.code = driver.code;
+            pill.dataset.type = type;
+
+            const textColor = ['#B6BABD'].includes(driver.color) ? '#000' : '#fff';
+
+            pill.innerHTML = `
+                <div class="driver-number bg-${driver.teamClass.split('-')[1]}" style="background-color: ${driver.color}; color: ${textColor};">
+                    ${driver.number}
+                </div>
+                <div class="driver-code">${driver.code}</div>
+                <div class="driver-surname">${driver.surname}</div>
+                <div class="driver-team">${driver.team}</div>
+            `;
+
+            return pill;
+        }
+
+        function selectDriver(code, type) {
+            const grids = document.querySelectorAll(`[data-type="${type}"]`);
+            grids.forEach(pill => pill.classList.remove('selected'));
+
+            if (type === 'primary') {
+                selectedPrimary = code;
+            } else {
+                if (selectedCompare === code) {
+                    selectedCompare = null;
+                    return;
+                }
+                selectedCompare = code;
+            }
+
+            const pill = document.querySelector(`[data-code="${code}"][data-type="${type}"]`);
+            if (pill) pill.classList.add('selected');
+        }
+
+        function updateProgress(lap) {
+            const percent = Math.round((lap / 53) * 100);
+            document.getElementById('progressPercent').textContent = percent + '%';
+            document.getElementById('currentLap').textContent = lap;
+
+            const bars = document.getElementById('progressBars');
+            bars.innerHTML = '';
+            for (let i = 0; i < 53; i++) {
+                const bar = document.createElement('div');
+                bar.className = `bar-segment ${i < lap ? 'active' : ''}`;
+                bars.appendChild(bar);
+            }
+        }
+
+        async function analyze() {
+            if (!selectedPrimary) {
+                showError('Select a primary driver');
+                return;
+            }
+
+            const lap = parseInt(document.getElementById('lapInput').value);
+            if (!lap || lap < 1 || lap > 53) {
+                showError('Enter valid lap (1-53)');
+                return;
+            }
+
+            updateProgress(lap);
+            document.getElementById('error').classList.add('hidden');
+            document.getElementById('loading').classList.remove('hidden');
+
+            try {
+                // Call real API for primary driver
+                const primaryResult = await fetchAnalysis(selectedPrimary, lap);
+                
+                let compareResult = null;
+                if (selectedCompare) {
+                    // Call real API for comparison driver
+                    compareResult = await fetchAnalysis(selectedCompare, lap);
+                }
+
+                if (selectedCompare && compareResult) {
+                    displayComparison(primaryResult, compareResult);
+                } else {
+                    displayResults(primaryResult);
+                }
+
+                // Auto-scroll to results with smooth behavior
+                setTimeout(() => {
+                    document.getElementById('results').scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start' 
+                    });
+                }, 100);
+
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                document.getElementById('loading').classList.add('hidden');
+            }
+        }
+
+        async function fetchAnalysis(driverCode, lapNumber) {
+            const response = await fetch(`${API_URL}/analyze`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    driver: driverCode,
+                    lap_number: lapNumber,
+                    year: 2024,
+                    session_type: 'R'
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Analysis failed');
+            }
+
+            return await response.json();
+        }
+
+        function displayResults(data) {
+            const driver = DRIVERS.find(d => d.code === selectedPrimary);
+            const results = document.getElementById('results');
+            results.classList.remove('hidden');
+            
+            const textColor = ['#B6BABD'].includes(driver.color) ? '#000' : '#fff';
+            
+            results.innerHTML = `
+                <div class="result-card" style="border-left: 3px solid ${driver.color};">
+                    <div class="driver-header">
+                        <div class="driver-avatar" style="background: ${driver.color}; color: ${textColor};">
+                            ${driver.number}
+                        </div>
+                        <div class="driver-info" style="flex: 1;">
+                            <h3 style="color: ${driver.color};">${driver.name}</h3>
+                            <p>${driver.team}</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="lap-time">${data.lap_data.actual_lap_time.toFixed(3)}<span class="text-2xl text-gray-500">s</span></div>
+                            <div class="delta ${data.lap_data.delta_seconds > 0 ? 'text-red-400' : 'text-green-400'}">
+                                ${data.lap_data.delta_seconds > 0 ? '+' : ''}${data.lap_data.delta_seconds.toFixed(3)}s
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-label">Lap Performance</div>
+                            <div class="metric-value">${data.lap_data.actual_lap_time.toFixed(3)}</div>
+                            <div class="text-xs text-gray-500 mt-2">Predicted: ${data.lap_data.predicted_pace.toFixed(3)}</div>
+                            <div class="mt-3">
+                                <span class="compound-badge" style="background: ${data.lap_data.compound === 'SOFT' ? '#DC0000' : data.lap_data.compound === 'MEDIUM' ? '#FFD700' : '#E5E5E5'}; color: ${data.lap_data.compound === 'HARD' ? '#000' : '#fff'};">
+                                    ${data.lap_data.compound}
+                                </span>
+                                <span class="text-xs text-gray-500 ml-2">${data.lap_data.tire_age} laps</span>
+                            </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-label">Tire Condition</div>
+                            <div class="tire-indicator" style="background: ${data.tire_analysis.condition === 'Fresh' ? '#22c55e' : data.tire_analysis.condition === 'Optimal' ? '#3b82f6' : data.tire_analysis.condition === 'Worn' ? '#f97316' : '#ef4444'};">
+                                ${data.tire_analysis.condition}
+                            </div>
+                            <div class="text-xs text-gray-500 text-center">${(data.tire_analysis.confidence * 100).toFixed(0)}% confidence</div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-label">Scenario</div>
+                            <div class="text-yellow-400 font-bold text-lg mb-3">${data.scenario.classification.replace(/_/g, ' ')}</div>
+                            <span class="priority-badge" style="background: ${data.strategy.priority === 'CRITICAL' ? '#DC2626' : data.strategy.priority === 'HIGH' ? '#F59E0B' : data.strategy.priority === 'MEDIUM' ? '#EAB308' : '#22C55E'};">
+                                ${data.strategy.priority}
+                            </span>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-label">Strategy</div>
+                            <div class="font-bold text-lg mb-2">${data.strategy.action.replace(/_/g, ' ')}</div>
+                            <div class="text-sm text-gray-400 mb-3">${data.strategy.reasoning}</div>
+                            <div class="text-xs text-gray-600 mb-2">Next Compound</div>
+                            <span class="compound-badge" style="background: ${data.recommendation.next_compound === 'SOFT' ? '#DC0000' : data.recommendation.next_compound === 'MEDIUM' ? '#FFD700' : '#E5E5E5'}; color: ${data.recommendation.next_compound === 'HARD' ? '#000' : '#fff'};">
+                                ${data.recommendation.next_compound}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayComparison(data1, data2) {
+            const driver1 = DRIVERS.find(d => d.code === selectedPrimary);
+            const driver2 = DRIVERS.find(d => d.code === selectedCompare);
+            const results = document.getElementById('results');
+            results.classList.remove('hidden');
+            
+            const textColor1 = ['#B6BABD'].includes(driver1.color) ? '#000' : '#fff';
+            const textColor2 = ['#B6BABD'].includes(driver2.color) ? '#000' : '#fff';
+            
+            results.innerHTML = `
+                <div style="margin-bottom: 2rem;">
+                    <h2 class="text-2xl font-bold mb-4" style="background: linear-gradient(135deg, #ff4444 0%, #ff6b6b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 0.1em;">HEAD-TO-HEAD COMPARISON</h2>
+                </div>
+                
+                <div class="results-grid">
+                    <div class="result-card col-span-6" style="border-left: 3px solid ${driver1.color};">
+                        <div class="driver-header">
+                            <div class="driver-avatar" style="background: ${driver1.color}; color: ${textColor1};">
+                                ${driver1.number}
+                            </div>
+                            <div class="driver-info" style="flex: 1;">
+                                <h3 style="color: ${driver1.color};">${driver1.name}</h3>
+                                <p>${driver1.team}</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="lap-time">${data1.lap_data.actual_lap_time.toFixed(3)}<span class="text-2xl text-gray-500">s</span></div>
+                                <div class="delta ${data1.lap_data.delta_seconds > 0 ? 'text-red-400' : 'text-green-400'}">
+                                    ${data1.lap_data.delta_seconds > 0 ? '+' : ''}${data1.lap_data.delta_seconds.toFixed(3)}s
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="metrics-grid">
+                            <div class="metric-card">
+                                <div class="metric-label">Lap Performance</div>
+                                <div class="metric-value">${data1.lap_data.actual_lap_time.toFixed(3)}</div>
+                                <div class="text-xs text-gray-500 mt-2">Predicted: ${data1.lap_data.predicted_pace.toFixed(3)}</div>
+                                <div class="mt-3">
+                                    <span class="compound-badge" style="background: ${data1.lap_data.compound === 'SOFT' ? '#DC0000' : data1.lap_data.compound === 'MEDIUM' ? '#FFD700' : '#E5E5E5'}; color: ${data1.lap_data.compound === 'HARD' ? '#000' : '#fff'};">
+                                        ${data1.lap_data.compound}
+                                    </span>
+                                    <span class="text-xs text-gray-500 ml-2">${data1.lap_data.tire_age} laps</span>
+                                </div>
+                            </div>
+
+                            <div class="metric-card">
+                                <div class="metric-label">Tire Condition</div>
+                                <div class="tire-indicator" style="background: ${data1.tire_analysis.condition === 'Fresh' ? '#22c55e' : data1.tire_analysis.condition === 'Optimal' ? '#3b82f6' : data1.tire_analysis.condition === 'Worn' ? '#f97316' : '#ef4444'};">
+                                    ${data1.tire_analysis.condition}
+                                </div>
+                                <div class="text-xs text-gray-500 text-center">${(data1.tire_analysis.confidence * 100).toFixed(0)}% confidence</div>
+                            </div>
+
+                            <div class="metric-card">
+                                <div class="metric-label">Scenario</div>
+                                <div class="text-yellow-400 font-bold text-lg mb-3">${data1.scenario.classification.replace(/_/g, ' ')}</div>
+                                <span class="priority-badge" style="background: ${data1.strategy.priority === 'CRITICAL' ? '#DC2626' : data1.strategy.priority === 'HIGH' ? '#F59E0B' : data1.strategy.priority === 'MEDIUM' ? '#EAB308' : '#22C55E'};">
+                                    ${data1.strategy.priority}
+                                </span>
+                            </div>
+
+                            <div class="metric-card">
+                                <div class="metric-label">Strategy</div>
+                                <div class="font-bold text-lg mb-2">${data1.strategy.action.replace(/_/g, ' ')}</div>
+                                <div class="text-sm text-gray-400 mb-3">${data1.strategy.reasoning}</div>
+                                <div class="text-xs text-gray-600 mb-2">Next Compound</div>
+                                <span class="compound-badge" style="background: ${data1.recommendation.next_compound === 'SOFT' ? '#DC0000' : data1.recommendation.next_compound === 'MEDIUM' ? '#FFD700' : '#E5E5E5'}; color: ${data1.recommendation.next_compound === 'HARD' ? '#000' : '#fff'};">
+                                    ${data1.recommendation.next_compound}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="result-card col-span-6" style="border-left: 3px solid ${driver2.color};">
+                        <div class="driver-header">
+                            <div class="driver-avatar" style="background: ${driver2.color}; color: ${textColor2};">
+                                ${driver2.number}
+                            </div>
+                            <div class="driver-info" style="flex: 1;">
+                                <h3 style="color: ${driver2.color};">${driver2.name}</h3>
+                                <p>${driver2.team}</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="lap-time">${data2.lap_data.actual_lap_time.toFixed(3)}<span class="text-2xl text-gray-500">s</span></div>
+                                <div class="delta ${data2.lap_data.delta_seconds > 0 ? 'text-red-400' : 'text-green-400'}">
+                                    ${data2.lap_data.delta_seconds > 0 ? '+' : ''}${data2.lap_data.delta_seconds.toFixed(3)}s
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="metrics-grid">
+                            <div class="metric-card">
+                                <div class="metric-label">Lap Performance</div>
+                                <div class="metric-value">${data2.lap_data.actual_lap_time.toFixed(3)}</div>
+                                <div class="text-xs text-gray-500 mt-2">Predicted: ${data2.lap_data.predicted_pace.toFixed(3)}</div>
+                                <div class="mt-3">
+                                    <span class="compound-badge" style="background: ${data2.lap_data.compound === 'SOFT' ? '#DC0000' : data2.lap_data.compound === 'MEDIUM' ? '#FFD700' : '#E5E5E5'}; color: ${data2.lap_data.compound === 'HARD' ? '#000' : '#fff'};">
+                                        ${data2.lap_data.compound}
+                                    </span>
+                                    <span class="text-xs text-gray-500 ml-2">${data2.lap_data.tire_age} laps</span>
+                                </div>
+                            </div>
+
+                            <div class="metric-card">
+                                <div class="metric-label">Tire Condition</div>
+                                <div class="tire-indicator" style="background: ${data2.tire_analysis.condition === 'Fresh' ? '#22c55e' : data2.tire_analysis.condition === 'Optimal' ? '#3b82f6' : data2.tire_analysis.condition === 'Worn' ? '#f97316' : '#ef4444'};">
+                                    ${data2.tire_analysis.condition}
+                                </div>
+                                <div class="text-xs text-gray-500 text-center">${(data2.tire_analysis.confidence * 100).toFixed(0)}% confidence</div>
+                            </div>
+
+                            <div class="metric-card">
+                                <div class="metric-label">Scenario</div>
+                                <div class="text-yellow-400 font-bold text-lg mb-3">${data2.scenario.classification.replace(/_/g, ' ')}</div>
+                                <span class="priority-badge" style="background: ${data2.strategy.priority === 'CRITICAL' ? '#DC2626' : data2.strategy.priority === 'HIGH' ? '#F59E0B' : data2.strategy.priority === 'MEDIUM' ? '#EAB308' : '#22C55E'};">
+                                    ${data2.strategy.priority}
+                                </span>
+                            </div>
+
+                            <div class="metric-card">
+                                <div class="metric-label">Strategy</div>
+                                <div class="font-bold text-lg mb-2">${data2.strategy.action.replace(/_/g, ' ')}</div>
+                                <div class="text-sm text-gray-400 mb-3">${data2.strategy.reasoning}</div>
+                                <div class="text-xs text-gray-600 mb-2">Next Compound</div>
+                                <span class="compound-badge" style="background: ${data2.recommendation.next_compound === 'SOFT' ? '#DC0000' : data2.recommendation.next_compound === 'MEDIUM' ? '#FFD700' : '#E5E5E5'}; color: ${data2.recommendation.next_compound === 'HARD' ? '#000' : '#fff'};">
+                                    ${data2.recommendation.next_compound}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showError(msg) {
+            const error = document.getElementById('error');
+            error.textContent = msg;
+            error.classList.remove('hidden');
+            setTimeout(() => error.classList.add('hidden'), 3000);
+        }
+
+        document.getElementById('lapInput').addEventListener('input', (e) => {
+            const lap = parseInt(e.target.value) || 0;
+            if (lap >= 1 && lap <= 53) updateProgress(lap);
+        });
+
+        init();
+    </script>
+</body>
+</html>

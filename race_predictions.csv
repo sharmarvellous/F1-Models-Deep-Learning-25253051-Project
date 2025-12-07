@@ -1,0 +1,4 @@
+driver,lap_number,stint_laps,compound,last_lap,predicted_lap,tire_condition,confidence,strategy,reason
+HAM,25,15,SOFT,93.5,33.465,FRESH,0.423,PUSH,Tires are fresh - maximize pace
+VER,24,10,MEDIUM,91.5,32.638,FRESH,0.431,PUSH,Tires are fresh - maximize pace
+LEC,30,25,HARD,94.5,34.45,FRESH,0.408,PUSH,Tires are fresh - maximize pace

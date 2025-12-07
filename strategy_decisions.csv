@@ -1,0 +1,4 @@
+driver,compound,stint_laps,predicted_lap,tyre_condition,confidence,action,reason
+HAM,SOFT,18,105.59266666666669,FRESH,0.4061032235622406,🟡 CONSIDER PIT,Tyres degrading: +0.90s on lap 18 (Soft compound - high degradation)
+VER,MEDIUM,12,90.84,FRESH,0.936057984828949,🟢 PUSH,Fresh tyres - exploit performance window
+LEC,HARD,25,97.78966666666669,FRESH,0.4069652855396271,🟡 CONSIDER PIT,Tyres degrading: +1.70s on lap 25
