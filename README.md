@@ -88,6 +88,7 @@ Endpoints:
 |-- requirements.txt
 |-- README.md
 
+```
 
 🔧 1. Installation
 Clone the repository
